@@ -1,0 +1,178 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "raycast-extensions",
+  "title": "Raycast Extensions",
+  "description": "AI-powered productivity tools",
+  "icon": "command-icon.png",
+  "author": "connorholly",
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "add-action",
+      "title": "Add Action",
+      "description": "Extract and approve action items from selected text",
+      "mode": "no-view"
+    },
+    {
+      "name": "list-actions",
+      "title": "List Actions",
+      "description": "View and schedule your action items",
+      "mode": "view"
+    },
+    {
+      "name": "extract-tasks",
+      "title": "Extract Tasks from Text",
+      "description": "Extract multiple tasks from selected text with approval",
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "apiKey",
+          "title": "OpenAI API Key",
+          "description": "Your OpenAI API key for GPT-4.1-mini",
+          "type": "password",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "tweetify",
+      "title": "Tweetify Selection",
+      "description": "Convert selected text into a 5-tweet thread",
+      "mode": "no-view",
+      "preferences": [
+        {
+          "name": "apiKey",
+          "title": "OpenAI API Key",
+          "description": "Your OpenAI API key for GPT-4.1-mini",
+          "type": "password",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "anki-capture",
+      "title": "Anki - Spaced Repetition Learning",
+      "description": "Create Anki flashcards from selected text",
+      "keywords": [
+        "anki",
+        "spaced",
+        "repetition",
+        "learning",
+        "flashcards",
+        "study"
+      ],
+      "mode": "no-view",
+      "preferences": [
+        {
+          "name": "apiKey",
+          "title": "OpenAI API Key",
+          "description": "Your OpenAI API key for GPT-4.1-mini",
+          "type": "password",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "add-reminder",
+      "title": "Add Reminder",
+      "description": "Add a new recurring reminder",
+      "mode": "view"
+    },
+    {
+      "name": "list-reminders",
+      "title": "List Reminders",
+      "description": "View and manage your recurring reminders",
+      "mode": "view"
+    },
+    {
+      "name": "usage-dashboard",
+      "title": "AI Usage Dashboard",
+      "description": "View API usage statistics and costs across all AI providers",
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "showEstimates",
+          "title": "Show Cost Estimates",
+          "description": "Display projected monthly costs based on current usage",
+          "type": "checkbox",
+          "default": true,
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "api-usage",
+      "title": "API Usage",
+      "description": "Show all API costs/limits for OpenAI, Anthropic, Google, and DeepSeek",
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "OPENAI_API_KEY",
+          "title": "OpenAI API Key",
+          "description": "Your OpenAI API key",
+          "type": "password",
+          "required": false
+        },
+        {
+          "name": "ANTHROPIC_API_KEY",
+          "title": "Anthropic API Key",
+          "description": "Your Anthropic API key",
+          "type": "password",
+          "required": false
+        },
+        {
+          "name": "GOOGLE_API_KEY",
+          "title": "Google API Key",
+          "description": "Your Google API key",
+          "type": "password",
+          "required": false
+        },
+        {
+          "name": "DEEPSEEK_API_KEY",
+          "title": "DeepSeek API Key",
+          "description": "Your DeepSeek API key",
+          "type": "password",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "improve-prompt",
+      "title": "Improve Prompt",
+      "description": "Enhance your prompt with better structure, clarity, and edge case handling",
+      "mode": "no-view",
+      "preferences": [
+        {
+          "name": "apiKey",
+          "title": "Google API Key",
+          "description": "Your Google API key for Gemini 2.0 Flash",
+          "type": "password",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.0",
+    "@google/generative-ai": "^0.1.3",
+    "@raycast/api": "^1.100.1",
+    "dotenv": "^16.5.0",
+    "execa": "^9.6.0",
+    "openai": "^5.5.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^2.0.4",
+    "@types/node": "22.10.2",
+    "@types/react": "^18.0.9",
+    "eslint": "^9.28.0",
+    "prettier": "^3.5.3",
+    "tsx": "^4.7.0",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "lint": "ray lint",
+    "eval": "tsx evals/anki-categorization-eval.ts"
+  }
+}
