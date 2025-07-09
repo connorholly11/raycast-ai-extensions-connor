@@ -6,32 +6,45 @@ import {
   Toast,
   getPreferenceValues,
 } from "@raycast/api";
-import { LLM } from "./lib/llm";
+import { MultiProviderLLM, ModelConfig } from "./lib/llm-multi-provider";
 
 interface Preferences {
-  apiKey: string; // Gemini API key
+  apiKey: string;
+  provider?: string;
+  model?: string;
 }
 
 export default async function main() {
   try {
-    const { apiKey } = getPreferenceValues<Preferences>();
+    const {
+      apiKey,
+      provider = "anthropic",
+      model = "claude-3-5-sonnet-latest",
+    } = getPreferenceValues<Preferences>();
     const selectedText = await getSelectedText();
 
     const toast = await showToast({
       style: Toast.Style.Animated,
-      title: "Generating tweet thread...",
+      title: "Crafting viral tweet...",
     });
 
-    const llm = new LLM({ apiKey });
-    const tweetThread = await llm.makeTweetThread(selectedText);
+    const config: ModelConfig = {
+      provider: provider as any,
+      model,
+      apiKey,
+      trackUsage: true,
+    };
 
-    await Clipboard.copy(tweetThread);
+    const llm = new MultiProviderLLM(config);
+    const viralTweet = await llm.makeViralTweet(selectedText);
+
+    await Clipboard.copy(viralTweet);
     await toast.hide();
-    await showHUD("✅ Thread copied to clipboard");
+    await showHUD("🔥 Viral tweet copied to clipboard");
   } catch (error) {
     await showToast({
       style: Toast.Style.Failure,
-      title: "Failed to generate thread",
+      title: "Failed to generate tweet",
       message: String(error),
     });
   }

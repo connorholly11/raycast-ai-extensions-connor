@@ -22,7 +22,7 @@ export class MultiProviderLLM {
 
   constructor(config: ModelConfig) {
     this.config = config;
-    
+
     switch (config.provider) {
       case "gemini":
         this.geminiClient = new GoogleGenerativeAI(config.apiKey);
@@ -35,9 +35,9 @@ export class MultiProviderLLM {
         break;
       case "deepseek":
         // DeepSeek uses OpenAI-compatible API
-        this.deepseekClient = new OpenAI({ 
+        this.deepseekClient = new OpenAI({
           apiKey: config.apiKey,
-          baseURL: "https://api.deepseek.com/v1"
+          baseURL: "https://api.deepseek.com/v1",
         });
         break;
     }
@@ -48,11 +48,11 @@ export class MultiProviderLLM {
     // Remove markdown code blocks if present
     const match = response.match(/```json\n([\s\S]*?)\n```/);
     if (match) return match[1];
-    
+
     // Also try without newlines
     const match2 = response.match(/```json([\s\S]*?)```/);
     if (match2) return match2[1].trim();
-    
+
     return response;
   }
 
@@ -62,9 +62,10 @@ export class MultiProviderLLM {
     inputTokens: number,
     outputTokens: number,
     success: boolean,
-    error?: string
+    error?: string,
   ): Promise<void> {
-    if (this.config.trackUsage !== false) { // Default to true
+    if (this.config.trackUsage !== false) {
+      // Default to true
       await UsageTracker.recordUsage({
         provider: this.config.provider,
         model: this.config.model,
@@ -72,7 +73,7 @@ export class MultiProviderLLM {
         inputTokens,
         outputTokens,
         success,
-        error
+        error,
       });
     }
   }
@@ -85,7 +86,7 @@ export class MultiProviderLLM {
 
   /** Detect a single actionable task; returns the task text or "NONE". */
   async detectAction(text: string): Promise<string> {
-    const prompt = 
+    const prompt =
       `Decide if the text contains ONE actionable task.\n` +
       `If yes, reply with the task in imperative mood only.\n` +
       `If no action, reply NONE (exact).\n\n` +
@@ -96,23 +97,25 @@ export class MultiProviderLLM {
     let outputTokens = 0;
     let success = true;
     let error: string | undefined;
-    
+
     try {
       switch (this.config.provider) {
         case "gemini":
-          const geminiModel = this.geminiClient!.getGenerativeModel({ model: this.config.model });
+          const geminiModel = this.geminiClient!.getGenerativeModel({
+            model: this.config.model,
+          });
           const geminiResult = await geminiModel.generateContent(prompt);
           response = geminiResult.response.text().trim();
           // Gemini doesn't provide token counts in response, so estimate
           outputTokens = this.estimateTokens(response);
           break;
-          
+
         case "openai":
           const openaiParams: any = {
             model: this.config.model,
-            messages: [{ role: "user", content: prompt }]
+            messages: [{ role: "user", content: prompt }],
           };
-          
+
           // O3 has special requirements
           if (this.config.model === "o3") {
             openaiParams.max_completion_tokens = 50;
@@ -121,8 +124,9 @@ export class MultiProviderLLM {
             openaiParams.max_tokens = 50;
             openaiParams.temperature = 0.3;
           }
-          
-          const openaiResult = await this.openaiClient!.chat.completions.create(openaiParams);
+
+          const openaiResult =
+            await this.openaiClient!.chat.completions.create(openaiParams);
           response = openaiResult.choices[0].message?.content || "NONE";
           // OpenAI provides token usage
           if (openaiResult.usage) {
@@ -130,29 +134,33 @@ export class MultiProviderLLM {
             outputTokens = openaiResult.usage.completion_tokens;
           }
           break;
-          
+
         case "anthropic":
           const anthropicResult = await this.anthropicClient!.messages.create({
             model: this.config.model,
             max_tokens: 50,
             messages: [{ role: "user", content: prompt }],
-            temperature: 0.3
+            temperature: 0.3,
           });
-          response = anthropicResult.content[0].type === 'text' ? anthropicResult.content[0].text : "NONE";
+          response =
+            anthropicResult.content[0].type === "text"
+              ? anthropicResult.content[0].text
+              : "NONE";
           // Anthropic provides token usage
           if (anthropicResult.usage) {
             inputTokens = anthropicResult.usage.input_tokens;
             outputTokens = anthropicResult.usage.output_tokens;
           }
           break;
-          
+
         case "deepseek":
-          const deepseekResult = await this.deepseekClient!.chat.completions.create({
-            model: this.config.model,
-            messages: [{ role: "user", content: prompt }],
-            max_tokens: 50,
-            temperature: 0.3
-          });
+          const deepseekResult =
+            await this.deepseekClient!.chat.completions.create({
+              model: this.config.model,
+              messages: [{ role: "user", content: prompt }],
+              max_tokens: 50,
+              temperature: 0.3,
+            });
           response = deepseekResult.choices[0].message?.content || "NONE";
           if (deepseekResult.usage) {
             inputTokens = deepseekResult.usage.prompt_tokens;
@@ -165,9 +173,15 @@ export class MultiProviderLLM {
       error = e instanceof Error ? e.message : String(e);
       throw e;
     } finally {
-      await this.trackUsage("detectAction", inputTokens, outputTokens, success, error);
+      await this.trackUsage(
+        "detectAction",
+        inputTokens,
+        outputTokens,
+        success,
+        error,
+      );
     }
-    
+
     return response.trim();
   }
 
@@ -188,22 +202,24 @@ export class MultiProviderLLM {
     let outputTokens = 0;
     let success = true;
     let error: string | undefined;
-    
+
     try {
       switch (this.config.provider) {
         case "gemini":
-          const geminiModel = this.geminiClient!.getGenerativeModel({ model: this.config.model });
+          const geminiModel = this.geminiClient!.getGenerativeModel({
+            model: this.config.model,
+          });
           const geminiResult = await geminiModel.generateContent(prompt);
           response = geminiResult.response.text().trim();
           outputTokens = this.estimateTokens(response);
           break;
-          
+
         case "openai":
           const openaiParams: any = {
             model: this.config.model,
-            messages: [{ role: "user", content: prompt }]
+            messages: [{ role: "user", content: prompt }],
           };
-          
+
           // O3 has special requirements
           if (this.config.model === "o3") {
             openaiParams.max_completion_tokens = 500;
@@ -212,36 +228,41 @@ export class MultiProviderLLM {
             openaiParams.max_tokens = 500;
             openaiParams.temperature = 0.7;
           }
-          
-          const openaiResult = await this.openaiClient!.chat.completions.create(openaiParams);
+
+          const openaiResult =
+            await this.openaiClient!.chat.completions.create(openaiParams);
           response = openaiResult.choices[0].message?.content || "";
           if (openaiResult.usage) {
             inputTokens = openaiResult.usage.prompt_tokens;
             outputTokens = openaiResult.usage.completion_tokens;
           }
           break;
-          
+
         case "anthropic":
           const anthropicResult = await this.anthropicClient!.messages.create({
             model: this.config.model,
             max_tokens: 500,
             messages: [{ role: "user", content: prompt }],
-            temperature: 0.7
+            temperature: 0.7,
           });
-          response = anthropicResult.content[0].type === 'text' ? anthropicResult.content[0].text : "";
+          response =
+            anthropicResult.content[0].type === "text"
+              ? anthropicResult.content[0].text
+              : "";
           if (anthropicResult.usage) {
             inputTokens = anthropicResult.usage.input_tokens;
             outputTokens = anthropicResult.usage.output_tokens;
           }
           break;
-          
+
         case "deepseek":
-          const deepseekResult = await this.deepseekClient!.chat.completions.create({
-            model: this.config.model,
-            messages: [{ role: "user", content: prompt }],
-            max_tokens: 500,
-            temperature: 0.7
-          });
+          const deepseekResult =
+            await this.deepseekClient!.chat.completions.create({
+              model: this.config.model,
+              messages: [{ role: "user", content: prompt }],
+              max_tokens: 500,
+              temperature: 0.7,
+            });
           response = deepseekResult.choices[0].message?.content || "";
           if (deepseekResult.usage) {
             inputTokens = deepseekResult.usage.prompt_tokens;
@@ -254,14 +275,23 @@ export class MultiProviderLLM {
       error = e instanceof Error ? e.message : String(e);
       throw e;
     } finally {
-      await this.trackUsage("makeTweetThread", inputTokens, outputTokens, success, error);
+      await this.trackUsage(
+        "makeTweetThread",
+        inputTokens,
+        outputTokens,
+        success,
+        error,
+      );
     }
-    
+
     return response.trim();
   }
 
   /** Generate Anki flashcards from text */
-  async generateAnkiCards(text: string, deckCategories: string[]): Promise<any[]> {
+  async generateAnkiCards(
+    text: string,
+    deckCategories: string[],
+  ): Promise<any[]> {
     const systemPrompt = `You are an expert flash-card writer.
 
 Return ONLY valid JSON in this form:
@@ -286,68 +316,75 @@ Guidelines:
     let outputTokens = 0;
     let success = true;
     let error: string | undefined;
-    
+
     try {
       switch (this.config.provider) {
         case "gemini":
-          const geminiModel = this.geminiClient!.getGenerativeModel({ model: this.config.model });
+          const geminiModel = this.geminiClient!.getGenerativeModel({
+            model: this.config.model,
+          });
           const geminiResult = await geminiModel.generateContent(prompt);
           response = geminiResult.response.text();
           outputTokens = this.estimateTokens(response);
           break;
-          
+
         case "openai":
           const openaiParams: any = {
             model: this.config.model,
             messages: [
               { role: "system", content: systemPrompt },
-              { role: "user", content: text }
+              { role: "user", content: text },
             ],
-            response_format: { type: "json_object" }
+            response_format: { type: "json_object" },
           };
-          
+
           // O3 has special requirements
           if (this.config.model === "o3") {
-            openaiParams.max_completion_tokens = 10000;  // Extended to 10k for O3
+            openaiParams.max_completion_tokens = 10000; // Extended to 10k for O3
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 300;
             openaiParams.temperature = 0.3;
           }
-          
-          const openaiResult = await this.openaiClient!.chat.completions.create(openaiParams);
+
+          const openaiResult =
+            await this.openaiClient!.chat.completions.create(openaiParams);
           response = openaiResult.choices[0].message?.content || "[]";
           if (openaiResult.usage) {
             inputTokens = openaiResult.usage.prompt_tokens;
             outputTokens = openaiResult.usage.completion_tokens;
           }
           break;
-          
+
         case "anthropic":
           const anthropicResult = await this.anthropicClient!.messages.create({
             model: this.config.model,
             max_tokens: 300,
             messages: [{ role: "user", content: prompt }],
-            temperature: 0.3
+            temperature: 0.3,
           });
-          response = anthropicResult.content[0].type === 'text' ? anthropicResult.content[0].text : "[]";
+          response =
+            anthropicResult.content[0].type === "text"
+              ? anthropicResult.content[0].text
+              : "[]";
           if (anthropicResult.usage) {
             inputTokens = anthropicResult.usage.input_tokens;
             outputTokens = anthropicResult.usage.output_tokens;
           }
           break;
-          
+
         case "deepseek":
-          const deepseekResult = await this.deepseekClient!.chat.completions.create({
-            model: this.config.model,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: text }
-            ],
-            max_tokens: 300,
-            temperature: 0.3,
-            response_format: { type: "json_object" }
-          });
+          const deepseekResult =
+            await this.deepseekClient!.chat.completions.create({
+              model: this.config.model,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: text },
+              ],
+              max_tokens: 300,
+              temperature: 0.3,
+              response_format: { type: "json_object" },
+            });
           response = deepseekResult.choices[0].message?.content || "[]";
           if (deepseekResult.usage) {
             inputTokens = deepseekResult.usage.prompt_tokens;
@@ -355,9 +392,9 @@ Guidelines:
           }
           break;
       }
-      
+
       const jsonStr = this.cleanJsonResponse(response);
-      
+
       const parsed = JSON.parse(jsonStr);
       // Ensure it's an array
       return Array.isArray(parsed) ? parsed : [parsed];
@@ -365,15 +402,172 @@ Guidelines:
       success = false;
       error = e instanceof Error ? e.message : String(e);
       console.error("Failed to parse response:", response);
-      throw new Error(`Failed to parse ${this.config.provider} response as JSON`);
+      throw new Error(
+        `Failed to parse ${this.config.provider} response as JSON`,
+      );
     } finally {
-      await this.trackUsage("generateAnkiCards", inputTokens, outputTokens, success, error);
+      await this.trackUsage(
+        "generateAnkiCards",
+        inputTokens,
+        outputTokens,
+        success,
+        error,
+      );
     }
+  }
+
+  /** Generate a single viral tweet from arbitrary text. */
+  async makeViralTweet(text: string): Promise<string> {
+    const prompt =
+      `You are a viral content expert who understands what makes tweets go viral.
+` +
+      `Transform the following text into ONE highly engaging, viral-worthy tweet.
+` +
+      `
+` +
+      `VIRAL TWEET PRINCIPLES:
+` +
+      `1. Hook: Start with something that grabs attention immediately
+` +
+      `2. Emotion: Evoke strong feelings (surprise, humor, outrage, inspiration)
+` +
+      `3. Relatability: Make it universally relatable or extremely niche
+` +
+      `4. Format: Use one of these proven formats:
+` +
+      `   - Controversial take + explanation
+` +
+      `   - "Nobody talks about..." revelations
+` +
+      `   - Personal story with universal lesson
+` +
+      `   - Counterintuitive insight
+` +
+      `   - List or thread tease ("Here are 5 ways...")
+` +
+      `   - Question that sparks debate
+` +
+      `5. Brevity: Keep it punchy and under 280 characters
+` +
+      `6. Call to action: Implicit shareability (make people want to QT/reply)
+` +
+      `
+` +
+      `STYLE GUIDELINES:
+` +
+      `- Use simple, conversational language
+` +
+      `- Break conventional grammar rules for impact
+` +
+      `- Strategic use of line breaks for emphasis
+` +
+      `- Emojis only if they add value (not forced)
+` +
+      `- Numbers/statistics if shocking or memorable
+` +
+      `
+` +
+      `Return ONLY the tweet text, nothing else.
+` +
+      `
+` +
+      `Text to transform:
+` +
+      text;
+
+    let response = "";
+    let inputTokens = this.estimateTokens(prompt);
+    let outputTokens = 0;
+    let success = true;
+    let error: string | undefined;
+
+    try {
+      switch (this.config.provider) {
+        case "gemini":
+          const geminiModel = this.geminiClient!.getGenerativeModel({
+            model: this.config.model,
+          });
+          const geminiResult = await geminiModel.generateContent(prompt);
+          response = geminiResult.response.text().trim();
+          outputTokens = this.estimateTokens(response);
+          break;
+
+        case "openai":
+          const openaiParams: any = {
+            model: this.config.model,
+            messages: [{ role: "user", content: prompt }],
+          };
+
+          // O3 has special requirements
+          if (this.config.model === "o3") {
+            openaiParams.max_completion_tokens = 100;
+            // O3 doesn't support temperature
+          } else {
+            openaiParams.max_tokens = 100;
+            openaiParams.temperature = 0.8;
+          }
+
+          const openaiResult =
+            await this.openaiClient!.chat.completions.create(openaiParams);
+          response = openaiResult.choices[0].message?.content || "";
+          if (openaiResult.usage) {
+            inputTokens = openaiResult.usage.prompt_tokens;
+            outputTokens = openaiResult.usage.completion_tokens;
+          }
+          break;
+
+        case "anthropic":
+          const anthropicResult = await this.anthropicClient!.messages.create({
+            model: this.config.model,
+            max_tokens: 100,
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.8,
+          });
+          response =
+            anthropicResult.content[0].type === "text"
+              ? anthropicResult.content[0].text
+              : "";
+          if (anthropicResult.usage) {
+            inputTokens = anthropicResult.usage.input_tokens;
+            outputTokens = anthropicResult.usage.output_tokens;
+          }
+          break;
+
+        case "deepseek":
+          const deepseekResult =
+            await this.deepseekClient!.chat.completions.create({
+              model: this.config.model,
+              messages: [{ role: "user", content: prompt }],
+              max_tokens: 100,
+              temperature: 0.8,
+            });
+          response = deepseekResult.choices[0].message?.content || "";
+          if (deepseekResult.usage) {
+            inputTokens = deepseekResult.usage.prompt_tokens;
+            outputTokens = deepseekResult.usage.completion_tokens;
+          }
+          break;
+      }
+    } catch (e) {
+      success = false;
+      error = e instanceof Error ? e.message : String(e);
+      throw e;
+    } finally {
+      await this.trackUsage(
+        "makeViralTweet",
+        inputTokens,
+        outputTokens,
+        success,
+        error,
+      );
+    }
+
+    return response.trim();
   }
 
   /** Extract multiple actionable tasks from text */
   async extractMultipleTasks(text: string): Promise<string[]> {
-    const prompt = 
+    const prompt =
       `Extract ALL actionable tasks from the following text.\n` +
       `An actionable task is something specific that needs to be done.\n` +
       `Return each task on a new line in imperative mood (e.g., "Call John", "Send report", "Review document").\n` +
@@ -397,22 +591,24 @@ Guidelines:
     let outputTokens = 0;
     let success = true;
     let error: string | undefined;
-    
+
     try {
       switch (this.config.provider) {
         case "gemini":
-          const geminiModel = this.geminiClient!.getGenerativeModel({ model: this.config.model });
+          const geminiModel = this.geminiClient!.getGenerativeModel({
+            model: this.config.model,
+          });
           const geminiResult = await geminiModel.generateContent(prompt);
           response = geminiResult.response.text().trim();
           outputTokens = this.estimateTokens(response);
           break;
-          
+
         case "openai":
           const openaiParams: any = {
             model: this.config.model,
-            messages: [{ role: "user", content: prompt }]
+            messages: [{ role: "user", content: prompt }],
           };
-          
+
           // O3 has special requirements
           if (this.config.model === "o3") {
             openaiParams.max_completion_tokens = 500;
@@ -421,36 +617,41 @@ Guidelines:
             openaiParams.max_tokens = 500;
             openaiParams.temperature = 0.3;
           }
-          
-          const openaiResult = await this.openaiClient!.chat.completions.create(openaiParams);
+
+          const openaiResult =
+            await this.openaiClient!.chat.completions.create(openaiParams);
           response = openaiResult.choices[0].message?.content || "NONE";
           if (openaiResult.usage) {
             inputTokens = openaiResult.usage.prompt_tokens;
             outputTokens = openaiResult.usage.completion_tokens;
           }
           break;
-          
+
         case "anthropic":
           const anthropicResult = await this.anthropicClient!.messages.create({
             model: this.config.model,
             max_tokens: 500,
             messages: [{ role: "user", content: prompt }],
-            temperature: 0.3
+            temperature: 0.3,
           });
-          response = anthropicResult.content[0].type === 'text' ? anthropicResult.content[0].text : "NONE";
+          response =
+            anthropicResult.content[0].type === "text"
+              ? anthropicResult.content[0].text
+              : "NONE";
           if (anthropicResult.usage) {
             inputTokens = anthropicResult.usage.input_tokens;
             outputTokens = anthropicResult.usage.output_tokens;
           }
           break;
-          
+
         case "deepseek":
-          const deepseekResult = await this.deepseekClient!.chat.completions.create({
-            model: this.config.model,
-            messages: [{ role: "user", content: prompt }],
-            max_tokens: 500,
-            temperature: 0.3
-          });
+          const deepseekResult =
+            await this.deepseekClient!.chat.completions.create({
+              model: this.config.model,
+              messages: [{ role: "user", content: prompt }],
+              max_tokens: 500,
+              temperature: 0.3,
+            });
           response = deepseekResult.choices[0].message?.content || "NONE";
           if (deepseekResult.usage) {
             inputTokens = deepseekResult.usage.prompt_tokens;
@@ -458,27 +659,33 @@ Guidelines:
           }
           break;
       }
-      
+
       // Parse the response
       if (response.trim() === "NONE") {
         return [];
       }
-      
+
       // Split by newlines and filter out empty lines
       const tasks = response
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
-        .filter(line => !line.match(/^[-•*]/)) // Remove bullet points if any
-        .map(line => line.replace(/^[-•*]\s*/, '')); // Clean up any remaining formatting
-      
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .filter((line) => !line.match(/^[-•*]/)) // Remove bullet points if any
+        .map((line) => line.replace(/^[-•*]\s*/, "")); // Clean up any remaining formatting
+
       return tasks;
     } catch (e) {
       success = false;
       error = e instanceof Error ? e.message : String(e);
       throw e;
     } finally {
-      await this.trackUsage("extractMultipleTasks", inputTokens, outputTokens, success, error);
+      await this.trackUsage(
+        "extractMultipleTasks",
+        inputTokens,
+        outputTokens,
+        success,
+        error,
+      );
     }
   }
 
@@ -490,11 +697,7 @@ Guidelines:
 
 /** List of supported models */
 export const SUPPORTED_MODELS = {
-  gemini: [
-    "gemini-2.0-flash",
-    "gemini-1.5-pro", 
-    "gemini-2.0-pro"
-  ],
+  gemini: ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-2.0-pro"],
   openai: [
     "o3",
     "gpt-4.1",
@@ -502,16 +705,13 @@ export const SUPPORTED_MODELS = {
     "gpt-4o",
     "gpt-4o-mini",
     "gpt-4-turbo",
-    "gpt-3.5-turbo"
+    "gpt-3.5-turbo",
   ],
   anthropic: [
     "claude-3-haiku-20240307",
     "claude-sonnet-4-20250514",
     "claude-opus-4-20250514",
-    "claude-3-5-sonnet-latest"
+    "claude-3-5-sonnet-latest",
   ],
-  deepseek: [
-    "deepseek-chat",
-    "deepseek-coder"
-  ]
+  deepseek: ["deepseek-chat", "deepseek-coder"],
 };

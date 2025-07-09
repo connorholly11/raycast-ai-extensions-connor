@@ -36,16 +36,39 @@
     },
     {
       "name": "tweetify",
-      "title": "Tweetify Selection",
-      "description": "Convert selected text into a 5-tweet thread",
+      "title": "Make Viral Tweet",
+      "description": "Transform selected text into a viral tweet optimized for engagement",
       "mode": "no-view",
       "preferences": [
         {
           "name": "apiKey",
-          "title": "OpenAI API Key",
-          "description": "Your OpenAI API key for GPT-4.1-mini",
+          "title": "API Key",
+          "description": "Your API key (defaults to Anthropic Claude for viral content)",
           "type": "password",
           "required": true
+        },
+        {
+          "name": "provider",
+          "title": "AI Provider",
+          "description": "Choose AI provider (Anthropic recommended for viral content)",
+          "type": "dropdown",
+          "required": false,
+          "default": "anthropic",
+          "data": [
+            { "title": "Anthropic (Recommended)", "value": "anthropic" },
+            { "title": "OpenAI", "value": "openai" },
+            { "title": "Google Gemini", "value": "gemini" },
+            { "title": "DeepSeek", "value": "deepseek" }
+          ]
+        },
+        {
+          "name": "model",
+          "title": "Model",
+          "description": "AI model to use (Claude 3.5 Sonnet recommended)",
+          "type": "textfield",
+          "required": false,
+          "default": "claude-3-5-sonnet-latest",
+          "placeholder": "claude-3-5-sonnet-latest"
         }
       ]
     },

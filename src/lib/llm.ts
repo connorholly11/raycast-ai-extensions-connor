@@ -10,7 +10,7 @@ export class LLM {
       provider: "openai",
       model: "gpt-4.1-mini",
       apiKey: opts.apiKey,
-      trackUsage: true
+      trackUsage: true,
     };
     this.multiLLM = new MultiProviderLLM(config);
   }
@@ -25,8 +25,16 @@ export class LLM {
     return this.multiLLM.makeTweetThread(text);
   }
 
+  /** Generate a single viral tweet from arbitrary text. */
+  async makeViralTweet(text: string): Promise<string> {
+    return this.multiLLM.makeViralTweet(text);
+  }
+
   /** Generate Anki flashcards from text */
-  async generateAnkiCards(text: string, deckCategories: string[]): Promise<any[]> {
+  async generateAnkiCards(
+    text: string,
+    deckCategories: string[],
+  ): Promise<any[]> {
     return this.multiLLM.generateAnkiCards(text, deckCategories);
   }
 

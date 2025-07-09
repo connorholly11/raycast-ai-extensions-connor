@@ -24,8 +24,12 @@ declare namespace Preferences {
 }
   /** Preferences accessible in the `tweetify` command */
   export type Tweetify = ExtensionPreferences & {
-  /** OpenAI API Key - Your OpenAI API key for GPT-4.1-mini */
-  "apiKey": string
+  /** API Key - Your API key (defaults to Anthropic Claude for viral content) */
+  "apiKey": string,
+  /** AI Provider - Choose AI provider (Anthropic recommended for viral content) */
+  "provider": "anthropic" | "openai" | "gemini" | "deepseek",
+  /** Model - AI model to use (Claude 3.5 Sonnet recommended) */
+  "model": string
 }
   /** Preferences accessible in the `anki-capture` command */
   export type AnkiCapture = ExtensionPreferences & {
