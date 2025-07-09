@@ -31,7 +31,9 @@ export default async function main() {
 
     const llm = new MultiProviderLLM(config);
     
-    const prompt = `You're about to write the most engagement-baiting tweet possible. Channel pure chaos energy.
+    const prompt = `Transform the text below into a single viral tweet. You're about to write the most engagement-baiting tweet possible. Channel pure chaos energy.
+
+IMPORTANT: You must create ONE tweet (280 chars max) from the provided text, keeping its core message but making it maximally viral.
 
 MINDSET: You're that guy who says what everyone's thinking but is too scared to tweet. You're simultaneously the smartest and dumbest person in the room. Think: Naval meets a shitposter who just discovered capitalism.
 
@@ -60,9 +62,9 @@ LANGUAGE RULES:
 
 The goal: Make them angry enough to quote tweet but true enough they can't refute it.
 
-Keep it under 280 chars. Make it impossible to ignore.
+FINAL OUTPUT: One tweet, 280 chars max, based on the text below. Make it impossible to ignore.
 
-Text to weaponize:
+Text to transform into a viral tweet:
 ${selectedText}`;
 
     const viralTweet = await llm.makeViralTweet(selectedText, "engagement", prompt);

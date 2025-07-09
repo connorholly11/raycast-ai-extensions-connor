@@ -453,7 +453,9 @@ Text to transform:
 ` + text;
 
     const informativePrompt = 
-      `Write an informative tweet in George Mack style. Educational but not preachy.
+      `Transform the text below into ONE informative tweet in George Mack style. Educational but not preachy.
+
+IMPORTANT: Create a single tweet (280 chars max) from the provided text, maintaining its core insight but making it educational and valuable.
 
 Core principles:
 - Start with a fascinating fact or insight
@@ -472,9 +474,9 @@ Format patterns that work:
 - "Everyone talks about X. Nobody talks about Y. Y matters more because..."
 - "The [field] principle that changed how I think: [principle + application]"
 
-Keep it under 280 chars but pack it with value. Make readers save it for later.
+OUTPUT: One tweet, 280 chars max, that transforms the text below into valuable, saveable content.
 
-Text to transform:
+Text to transform into an informative tweet:
 ` + text;
 
     const prompt = customPrompt || (style === "engagement" ? engagementPrompt : informativePrompt);
