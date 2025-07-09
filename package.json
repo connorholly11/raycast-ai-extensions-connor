@@ -37,13 +37,13 @@
     {
       "name": "viral-tweet",
       "title": "Viral Tweet (Chaos Mode)",
-      "description": "Transform text into maximum engagement bait using Claude Opus 4",
+      "description": "Transform text into maximum engagement bait using Gemini Flash",
       "mode": "no-view",
       "preferences": [
         {
           "name": "apiKey",
-          "title": "Anthropic API Key",
-          "description": "Your Anthropic API key for Claude Opus 4",
+          "title": "Google API Key",
+          "description": "Your Google API key for Gemini 2.0 Flash",
           "type": "password",
           "required": true
         }

@@ -23,8 +23,8 @@ export default async function main() {
     });
 
     const config: ModelConfig = {
-      provider: "anthropic",
-      model: "claude-opus-4-20250514",
+      provider: "gemini",
+      model: "gemini-2.0-flash",
       apiKey,
       trackUsage: true,
     };

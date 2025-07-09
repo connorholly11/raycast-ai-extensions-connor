@@ -24,7 +24,7 @@ declare namespace Preferences {
 }
   /** Preferences accessible in the `viral-tweet` command */
   export type ViralTweet = ExtensionPreferences & {
-  /** Anthropic API Key - Your Anthropic API key for Claude Opus 4 */
+  /** Google API Key - Your Google API key for Gemini 2.0 Flash */
   "apiKey": string
 }
   /** Preferences accessible in the `informative-tweet` command */
