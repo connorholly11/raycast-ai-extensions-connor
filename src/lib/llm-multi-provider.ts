@@ -56,6 +56,11 @@ export class MultiProviderLLM {
     return response;
   }
 
+  /** Helper to check if model is O3 reasoning model */
+  private isO3Model(model: string): boolean {
+    return model === "o3" || model === "o3-high";
+  }
+
   /** Helper to track usage if enabled */
   private async trackUsage(
     command: string,
@@ -116,9 +121,9 @@ export class MultiProviderLLM {
             messages: [{ role: "user", content: prompt }],
           };
 
-          // O3 has special requirements
-          if (this.config.model === "o3") {
-            openaiParams.max_completion_tokens = 50;
+          // O3 reasoning models require max_completion_tokens
+          if (this.isO3Model(this.config.model)) {
+            openaiParams.max_completion_tokens = 256;
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 50;
@@ -220,9 +225,9 @@ export class MultiProviderLLM {
             messages: [{ role: "user", content: prompt }],
           };
 
-          // O3 has special requirements
-          if (this.config.model === "o3") {
-            openaiParams.max_completion_tokens = 500;
+          // O3 reasoning models require max_completion_tokens
+          if (this.isO3Model(this.config.model)) {
+            openaiParams.max_completion_tokens = 400;
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 500;
@@ -338,9 +343,9 @@ Guidelines:
             response_format: { type: "json_object" },
           };
 
-          // O3 has special requirements
-          if (this.config.model === "o3") {
-            openaiParams.max_completion_tokens = 10000; // Extended to 10k for O3
+          // O3 reasoning models require max_completion_tokens
+          if (this.isO3Model(this.config.model)) {
+            openaiParams.max_completion_tokens = 2000; // For ~20 Q-A pairs
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 300;
@@ -494,9 +499,9 @@ Text to transform:
             messages: [{ role: "user", content: prompt }],
           };
 
-          // O3 has special requirements
-          if (this.config.model === "o3") {
-            openaiParams.max_completion_tokens = 100;
+          // O3 reasoning models require max_completion_tokens
+          if (this.isO3Model(this.config.model)) {
+            openaiParams.max_completion_tokens = 120; // Fits 280 chars tweet
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 100;
@@ -605,9 +610,9 @@ Text to transform:
             messages: [{ role: "user", content: prompt }],
           };
 
-          // O3 has special requirements
-          if (this.config.model === "o3") {
-            openaiParams.max_completion_tokens = 500;
+          // O3 reasoning models require max_completion_tokens
+          if (this.isO3Model(this.config.model)) {
+            openaiParams.max_completion_tokens = 512; // For parsing multiple tasks
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 500;
@@ -696,6 +701,7 @@ export const SUPPORTED_MODELS = {
   gemini: ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-2.0-pro"],
   openai: [
     "o3",
+    "o3-high",
     "gpt-4.1",
     "gpt-4.1-mini",
     "gpt-4o",
