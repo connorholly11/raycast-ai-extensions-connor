@@ -12,6 +12,7 @@ interface Preferences {
   apiKey: string;
   provider?: string;
   model?: string;
+  style?: "engagement" | "informative";
 }
 
 export default async function main() {
@@ -20,12 +21,13 @@ export default async function main() {
       apiKey,
       provider = "anthropic",
       model = "claude-3-5-sonnet-latest",
+      style = "engagement",
     } = getPreferenceValues<Preferences>();
     const selectedText = await getSelectedText();
 
     const toast = await showToast({
       style: Toast.Style.Animated,
-      title: "Crafting viral tweet...",
+      title: style === "engagement" ? "Crafting viral tweet..." : "Creating informative tweet...",
     });
 
     const config: ModelConfig = {
@@ -36,11 +38,11 @@ export default async function main() {
     };
 
     const llm = new MultiProviderLLM(config);
-    const viralTweet = await llm.makeViralTweet(selectedText);
+    const viralTweet = await llm.makeViralTweet(selectedText, style);
 
     await Clipboard.copy(viralTweet);
     await toast.hide();
-    await showHUD("🔥 Viral tweet copied to clipboard");
+    await showHUD(style === "engagement" ? "Viral tweet copied to clipboard" : "Informative tweet copied to clipboard");
   } catch (error) {
     await showToast({
       style: Toast.Style.Failure,

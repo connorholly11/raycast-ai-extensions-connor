@@ -69,6 +69,18 @@
           "required": false,
           "default": "claude-3-5-sonnet-latest",
           "placeholder": "claude-3-5-sonnet-latest"
+        },
+        {
+          "name": "style",
+          "title": "Tweet Style",
+          "description": "Choose tweet style",
+          "type": "dropdown",
+          "required": false,
+          "default": "engagement",
+          "data": [
+            { "title": "Engagement Hacking (Nick Huber/Nikita Bier style)", "value": "engagement" },
+            { "title": "Informative (George Mack style)", "value": "informative" }
+          ]
         }
       ]
     },

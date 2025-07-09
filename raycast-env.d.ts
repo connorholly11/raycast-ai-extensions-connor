@@ -29,7 +29,9 @@ declare namespace Preferences {
   /** AI Provider - Choose AI provider (Anthropic recommended for viral content) */
   "provider": "anthropic" | "openai" | "gemini" | "deepseek",
   /** Model - AI model to use (Claude 3.5 Sonnet recommended) */
-  "model": string
+  "model": string,
+  /** Tweet Style - Choose tweet style */
+  "style": "engagement" | "informative"
 }
   /** Preferences accessible in the `anki-capture` command */
   export type AnkiCapture = ExtensionPreferences & {

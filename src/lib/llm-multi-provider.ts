@@ -417,63 +417,59 @@ Guidelines:
   }
 
   /** Generate a single viral tweet from arbitrary text. */
-  async makeViralTweet(text: string): Promise<string> {
-    const prompt =
-      `You are a viral content expert who understands what makes tweets go viral.
-` +
-      `Transform the following text into ONE highly engaging, viral-worthy tweet.
-` +
-      `
-` +
-      `VIRAL TWEET PRINCIPLES:
-` +
-      `1. Hook: Start with something that grabs attention immediately
-` +
-      `2. Emotion: Evoke strong feelings (surprise, humor, outrage, inspiration)
-` +
-      `3. Relatability: Make it universally relatable or extremely niche
-` +
-      `4. Format: Use one of these proven formats:
-` +
-      `   - Controversial take + explanation
-` +
-      `   - "Nobody talks about..." revelations
-` +
-      `   - Personal story with universal lesson
-` +
-      `   - Counterintuitive insight
-` +
-      `   - List or thread tease ("Here are 5 ways...")
-` +
-      `   - Question that sparks debate
-` +
-      `5. Brevity: Keep it punchy and under 280 characters
-` +
-      `6. Call to action: Implicit shareability (make people want to QT/reply)
-` +
-      `
-` +
-      `STYLE GUIDELINES:
-` +
-      `- Use simple, conversational language
-` +
-      `- Break conventional grammar rules for impact
-` +
-      `- Strategic use of line breaks for emphasis
-` +
-      `- Emojis only if they add value (not forced)
-` +
-      `- Numbers/statistics if shocking or memorable
-` +
-      `
-` +
-      `Return ONLY the tweet text, nothing else.
-` +
-      `
-` +
-      `Text to transform:
-` +
-      text;
+  async makeViralTweet(text: string, style: "engagement" | "informative" = "engagement"): Promise<string> {
+    const engagementPrompt = 
+      `Write a tweet that will get maximum engagement. Channel Nick Huber or Nikita Bier's style.
+
+Core principles:
+- Start with a bold, controversial statement
+- Use extreme examples that trigger reactions
+- Make people feel smart for agreeing or dumb for disagreeing
+- Create an us vs them dynamic
+- Use specific numbers when possible
+- Make claims that are 80% true but stated as 100% fact
+- Write like you're texting a friend who gets your humor
+- NO EMOJIS
+
+Format tricks that work:
+- "Most people don't realize..."
+- "Unpopular opinion: [obviously popular thing]"
+- "The difference between X and Y is..."
+- "[Successful thing] is just [simple thing] in disguise"
+- "I made $X doing Y and here's the secret..."
+- "Stop doing X. Start doing Y."
+
+Keep it under 280 chars. Make normies mad and smart people nod.
+
+Text to transform:
+` + text;
+
+    const informativePrompt = 
+      `Write an informative tweet in George Mack style. Educational but not preachy.
+
+Core principles:
+- Start with a fascinating fact or insight
+- Use clear structure (often numbered points)
+- Make complex ideas simple without dumbing them down
+- Include specific examples or case studies
+- Write like you're explaining to a smart friend
+- Use line breaks strategically for readability
+- Focus on timeless principles over trending topics
+- NO EMOJIS
+
+Format patterns that work:
+- "The [concept] paradox: [explanation]"
+- "3 things I learned about X: 1) ... 2) ... 3) ..."
+- "[Famous person] did X. The result: Y. The lesson: Z"
+- "Everyone talks about X. Nobody talks about Y. Y matters more because..."
+- "The [field] principle that changed how I think: [principle + application]"
+
+Keep it under 280 chars but pack it with value. Make readers save it for later.
+
+Text to transform:
+` + text;
+
+    const prompt = style === "engagement" ? engagementPrompt : informativePrompt;
 
     let response = "";
     let inputTokens = this.estimateTokens(prompt);
