@@ -121,9 +121,10 @@ export class MultiProviderLLM {
             messages: [{ role: "user", content: prompt }],
           };
 
-          // O3 reasoning models don't support temperature
+          // O3 reasoning models use max_completion_tokens and don't support temperature
           if (this.isO3Model(this.config.model)) {
-            openaiParams.max_tokens = 256;
+            openaiParams.max_completion_tokens = 256;
+            delete openaiParams.max_tokens;
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 50;
@@ -225,9 +226,10 @@ export class MultiProviderLLM {
             messages: [{ role: "user", content: prompt }],
           };
 
-          // O3 reasoning models don't support temperature
+          // O3 reasoning models use max_completion_tokens and don't support temperature
           if (this.isO3Model(this.config.model)) {
-            openaiParams.max_tokens = 400;
+            openaiParams.max_completion_tokens = 400;
+            delete openaiParams.max_tokens;
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 500;
@@ -343,9 +345,10 @@ Guidelines:
             response_format: { type: "json_object" },
           };
 
-          // O3 reasoning models don't support temperature
+          // O3 reasoning models use max_completion_tokens and don't support temperature
           if (this.isO3Model(this.config.model)) {
-            openaiParams.max_tokens = 2000; // For ~20 Q-A pairs
+            openaiParams.max_completion_tokens = 10000; // Extended for O3
+            delete openaiParams.max_tokens;
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 300;
@@ -499,9 +502,10 @@ Text to transform:
             messages: [{ role: "user", content: prompt }],
           };
 
-          // O3 reasoning models don't support temperature
+          // O3 reasoning models use max_completion_tokens and don't support temperature
           if (this.isO3Model(this.config.model)) {
-            openaiParams.max_tokens = 120; // Fits 280 chars tweet
+            openaiParams.max_completion_tokens = 10000; // Extended for O3
+            delete openaiParams.max_tokens; // Remove max_tokens for O3
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 100;
@@ -610,9 +614,10 @@ Text to transform:
             messages: [{ role: "user", content: prompt }],
           };
 
-          // O3 reasoning models don't support temperature
+          // O3 reasoning models use max_completion_tokens and don't support temperature
           if (this.isO3Model(this.config.model)) {
-            openaiParams.max_tokens = 512; // For parsing multiple tasks
+            openaiParams.max_completion_tokens = 512; // For parsing multiple tasks
+            delete openaiParams.max_tokens;
             // O3 doesn't support temperature
           } else {
             openaiParams.max_tokens = 500;
