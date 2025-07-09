@@ -463,6 +463,7 @@ Core principles:
 - Make complex ideas simple without dumbing them down
 - Include specific examples or case studies
 - Write like you're explaining to a smart friend
+- Apply Feynman technique: explain it so a child could understand the concept
 - Use line breaks strategically for readability
 - Focus on timeless principles over trending topics
 - NO EMOJIS
