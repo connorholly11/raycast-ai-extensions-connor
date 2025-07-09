@@ -26,8 +26,8 @@ export class LLM {
   }
 
   /** Generate a single viral tweet from arbitrary text. */
-  async makeViralTweet(text: string, style: "engagement" | "informative" = "engagement"): Promise<string> {
-    return this.multiLLM.makeViralTweet(text, style);
+  async makeViralTweet(text: string, style: "engagement" | "informative" = "engagement", customPrompt?: string): Promise<string> {
+    return this.multiLLM.makeViralTweet(text, style, customPrompt);
   }
 
   /** Generate Anki flashcards from text */

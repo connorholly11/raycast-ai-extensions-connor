@@ -22,16 +22,15 @@ declare namespace Preferences {
   /** OpenAI API Key - Your OpenAI API key for GPT-4.1-mini */
   "apiKey": string
 }
-  /** Preferences accessible in the `tweetify` command */
-  export type Tweetify = ExtensionPreferences & {
-  /** API Key - Your API key (defaults to Anthropic Claude for viral content) */
-  "apiKey": string,
-  /** AI Provider - Choose AI provider (Anthropic recommended for viral content) */
-  "provider": "anthropic" | "openai" | "gemini" | "deepseek",
-  /** Model - AI model to use (Claude 3.5 Sonnet recommended) */
-  "model": string,
-  /** Tweet Style - Choose tweet style */
-  "style": "engagement" | "informative"
+  /** Preferences accessible in the `viral-tweet` command */
+  export type ViralTweet = ExtensionPreferences & {
+  /** Anthropic API Key - Your Anthropic API key for Claude Opus 4 */
+  "apiKey": string
+}
+  /** Preferences accessible in the `informative-tweet` command */
+  export type InformativeTweet = ExtensionPreferences & {
+  /** OpenAI API Key - Your OpenAI API key for O3 model */
+  "apiKey": string
 }
   /** Preferences accessible in the `anki-capture` command */
   export type AnkiCapture = ExtensionPreferences & {
@@ -72,8 +71,10 @@ declare namespace Arguments {
   export type ListActions = {}
   /** Arguments passed to the `extract-tasks` command */
   export type ExtractTasks = {}
-  /** Arguments passed to the `tweetify` command */
-  export type Tweetify = {}
+  /** Arguments passed to the `viral-tweet` command */
+  export type ViralTweet = {}
+  /** Arguments passed to the `informative-tweet` command */
+  export type InformativeTweet = {}
   /** Arguments passed to the `anki-capture` command */
   export type AnkiCapture = {}
   /** Arguments passed to the `add-reminder` command */

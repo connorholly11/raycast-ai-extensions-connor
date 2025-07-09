@@ -417,7 +417,7 @@ Guidelines:
   }
 
   /** Generate a single viral tweet from arbitrary text. */
-  async makeViralTweet(text: string, style: "engagement" | "informative" = "engagement"): Promise<string> {
+  async makeViralTweet(text: string, style: "engagement" | "informative" = "engagement", customPrompt?: string): Promise<string> {
     const engagementPrompt = 
       `Write a tweet that will get maximum engagement. Channel Nick Huber or Nikita Bier's style.
 
@@ -469,7 +469,7 @@ Keep it under 280 chars but pack it with value. Make readers save it for later.
 Text to transform:
 ` + text;
 
-    const prompt = style === "engagement" ? engagementPrompt : informativePrompt;
+    const prompt = customPrompt || (style === "engagement" ? engagementPrompt : informativePrompt);
 
     let response = "";
     let inputTokens = this.estimateTokens(prompt);
