@@ -31,55 +31,23 @@ export default async function main() {
 
     const llm = new MultiProviderLLM(config);
     
-    const prompt = `Transform this into a high-value informative tweet. Think George Mack meets James Clear.
-
-CORE PRINCIPLES:
-- Lead with insight, not opinion
-- Make complexity simple without dumbing it down
-- Use concrete examples and specific details
-- Structure for maximum clarity and retention
-- Write timeless content, not reactive takes
-- Assume reader is smart but busy
-
-EFFECTIVE FORMATS:
-- "The [X] Framework: [clear explanation with steps]"
-- "[Number] lessons from [specific situation]: 1) ... 2) ... 3) ..."
-- "What [expert/company] knows that most don't: [insight]"
-- "The hidden reason [phenomenon] happens: [explanation]"
-- "[Common belief] is wrong. Here's what actually works: [truth]"
-- "How [successful example] really [achieved outcome]: [breakdown]"
-
-STRUCTURAL ELEMENTS:
-- Use line breaks to aid scanning
-- Number points when listing multiple items
-- Include one specific stat or example
-- End with actionable insight
-- No emojis or gimmicks
-
-WRITING STYLE:
-- Clear, precise language
-- Active voice
-- Short sentences
-- One idea per line
-- Zero fluff
-
-Goal: Make readers save this to reference later. Pack maximum insight into minimum words.
-
-Keep under 280 chars. Optimize for bookmark-ability.
-
-Text to distill:
-${selectedText}`;
-
-    const informativeTweet = await llm.makeViralTweet(selectedText, "informative", prompt);
+    const informativeTweet = await llm.makeViralTweet(selectedText, "informative");
+    
+    console.log("Generated tweet:", informativeTweet);
+    
+    if (!informativeTweet || informativeTweet.trim() === "") {
+      throw new Error("Empty response from AI model");
+    }
 
     await Clipboard.copy(informativeTweet);
     await toast.hide();
     await showHUD("Wisdom packaged and copied");
   } catch (error) {
+    console.error("Informative tweet error:", error);
     await showToast({
       style: Toast.Style.Failure,
       title: "Failed to generate insight",
-      message: String(error),
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 }
