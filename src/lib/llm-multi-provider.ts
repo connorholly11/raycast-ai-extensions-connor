@@ -453,9 +453,9 @@ Text to transform:
 ` + text;
 
     const informativePrompt = 
-      `Transform the text below into ONE informative tweet in George Mack style. Educational but not preachy.
+      `Transform the text below into an informative tweet in George Mack style. Educational but not preachy.
 
-IMPORTANT: Create a single tweet (280 chars max) from the provided text, maintaining its core insight but making it educational and valuable.
+IMPORTANT: Create a tweet from the provided text, maintaining its core insight but making it educational and valuable. Length can be whatever serves the content best - from punchy one-liner to detailed thread starter.
 
 Core principles:
 - Start with a fascinating fact or insight
@@ -467,6 +467,12 @@ Core principles:
 - Focus on timeless principles over trending topics
 - NO EMOJIS
 
+MULTIMEDIA SUGGESTIONS:
+- If the content would benefit from visuals, suggest: [Add photo: description]
+- For complex concepts, suggest: [Add diagram: what to illustrate]
+- For processes/steps, suggest: [Add video: what to demonstrate]
+- For data/stats, suggest: [Add chart: what data to visualize]
+
 Format patterns that work:
 - "The [concept] paradox: [explanation]"
 - "3 things I learned about X: 1) ... 2) ... 3) ..."
@@ -474,7 +480,7 @@ Format patterns that work:
 - "Everyone talks about X. Nobody talks about Y. Y matters more because..."
 - "The [field] principle that changed how I think: [principle + application]"
 
-OUTPUT: One tweet, 280 chars max, that transforms the text below into valuable, saveable content.
+OUTPUT: A tweet of optimal length for the content. Can be short and punchy or longer if needed. Include multimedia suggestions where they'd enhance understanding.
 
 Text to transform into an informative tweet:
 ` + text;
