@@ -25,21 +25,19 @@ async function getReminders(): Promise<Reminder[]> {
 
 async function updateReminder(id: string, nextDue: string) {
   const reminders = await getReminders();
-  const updated = reminders.map(r => 
-    r.id === id ? { ...r, nextDue } : r
-  );
+  const updated = reminders.map((r) => (r.id === id ? { ...r, nextDue } : r));
   await LocalStorage.setItem("reminders", JSON.stringify(updated));
 }
 
 async function deleteReminder(id: string) {
   const reminders = await getReminders();
-  const filtered = reminders.filter(r => r.id !== id);
+  const filtered = reminders.filter((r) => r.id !== id);
   await LocalStorage.setItem("reminders", JSON.stringify(filtered));
 }
 
 function getNextDueDate(frequency: string, fromDate: Date = new Date()): Date {
   const date = new Date(fromDate);
-  
+
   switch (frequency) {
     case "daily":
       date.setDate(date.getDate() + 1);
@@ -60,7 +58,7 @@ function getNextDueDate(frequency: string, fromDate: Date = new Date()): Date {
       date.setFullYear(date.getFullYear() + 1);
       break;
   }
-  
+
   return date;
 }
 
@@ -69,7 +67,7 @@ function getDaysUntil(dateString: string): number {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   date.setHours(0, 0, 0, 0);
-  
+
   return Math.floor((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
@@ -101,11 +99,14 @@ export default function Command() {
   return (
     <List isLoading={loading} searchBarPlaceholder="Filter reminders…">
       {reminders
-        .sort((a, b) => new Date(a.nextDue).getTime() - new Date(b.nextDue).getTime())
+        .sort(
+          (a, b) =>
+            new Date(a.nextDue).getTime() - new Date(b.nextDue).getTime(),
+        )
         .map((reminder) => {
           const days = getDaysUntil(reminder.nextDue);
           const dueDate = new Date(reminder.nextDue);
-          
+
           let subtitle = "";
           if (days < 0) {
             subtitle = `${Math.abs(days)} day${Math.abs(days) !== 1 ? "s" : ""} overdue`;
@@ -121,17 +122,17 @@ export default function Command() {
               title={reminder.title}
               subtitle={subtitle}
               icon={getItemIcon(days)}
-              accessories={[
-                { text: reminder.frequency },
-                { date: dueDate }
-              ]}
+              accessories={[{ text: reminder.frequency }, { date: dueDate }]}
               actions={
                 <ActionPanel>
                   <Action
                     title="Mark Done"
                     icon={Icon.Checkmark}
                     onAction={async () => {
-                      const nextDue = getNextDueDate(reminder.frequency, new Date());
+                      const nextDue = getNextDueDate(
+                        reminder.frequency,
+                        new Date(),
+                      );
                       await updateReminder(reminder.id, nextDue.toISOString());
                       await showHUD("✅ Marked as done");
                       await refresh();

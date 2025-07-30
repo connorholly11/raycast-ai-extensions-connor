@@ -1,4 +1,11 @@
-import { Action, ActionPanel, Form, LocalStorage, showHUD, popToRoot } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Form,
+  LocalStorage,
+  showHUD,
+  popToRoot,
+} from "@raycast/api";
 import { useState } from "react";
 
 type Reminder = {
@@ -22,7 +29,7 @@ async function saveReminder(reminder: Reminder) {
 
 function getNextDueDate(frequency: string, startDate: Date = new Date()): Date {
   const date = new Date(startDate);
-  
+
   switch (frequency) {
     case "daily":
       date.setDate(date.getDate() + 1);
@@ -43,7 +50,7 @@ function getNextDueDate(frequency: string, startDate: Date = new Date()): Date {
       date.setFullYear(date.getFullYear() + 1);
       break;
   }
-  
+
   return date;
 }
 
@@ -52,9 +59,11 @@ export default function Command() {
 
   async function handleSubmit(values: Form.Values) {
     setLoading(true);
-    
-    const firstDue = values.firstDue ? new Date(values.firstDue) : getNextDueDate(values.frequency);
-    
+
+    const firstDue = values.firstDue
+      ? new Date(values.firstDue)
+      : getNextDueDate(values.frequency);
+
     const reminder: Reminder = {
       id: Date.now().toString(),
       title: values.title,
@@ -62,7 +71,7 @@ export default function Command() {
       nextDue: firstDue.toISOString(),
       createdAt: new Date().toISOString(),
     };
-    
+
     await saveReminder(reminder);
     await showHUD("✅ Reminder added");
     await popToRoot();
@@ -77,22 +86,25 @@ export default function Command() {
         </ActionPanel>
       }
     >
-      <Form.TextField 
-        id="title" 
-        title="Title" 
+      <Form.TextField
+        id="title"
+        title="Title"
         placeholder="e.g., Dentist appointment, Oil change"
         autoFocus
       />
-      
+
       <Form.Dropdown id="frequency" title="Frequency" defaultValue="monthly">
         <Form.Dropdown.Item value="daily" title="Daily" />
         <Form.Dropdown.Item value="weekly" title="Weekly" />
         <Form.Dropdown.Item value="monthly" title="Monthly" />
         <Form.Dropdown.Item value="quarterly" title="Quarterly (3 months)" />
-        <Form.Dropdown.Item value="semi-annual" title="Semi-Annual (6 months)" />
+        <Form.Dropdown.Item
+          value="semi-annual"
+          title="Semi-Annual (6 months)"
+        />
         <Form.Dropdown.Item value="annual" title="Annual" />
       </Form.Dropdown>
-      
+
       <Form.DatePicker
         id="firstDue"
         title="First Due Date (Optional)"

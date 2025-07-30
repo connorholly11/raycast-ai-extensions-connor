@@ -1,4 +1,11 @@
-import { getSelectedText, Clipboard, showHUD, showToast, Toast, getPreferenceValues } from "@raycast/api";
+import {
+  getSelectedText,
+  Clipboard,
+  showHUD,
+  showToast,
+  Toast,
+  getPreferenceValues,
+} from "@raycast/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface Preferences {
@@ -74,7 +81,7 @@ ${selectedText}
 
     // Copy to clipboard
     await Clipboard.copy(improvedPrompt);
-    
+
     await showToast({
       style: Toast.Style.Success,
       title: "Prompt improved!",
@@ -82,7 +89,6 @@ ${selectedText}
     });
 
     await showHUD("✅ Improved prompt copied!");
-
   } catch (error) {
     console.error("Error improving prompt:", error);
     await showToast({

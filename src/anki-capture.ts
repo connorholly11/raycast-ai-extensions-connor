@@ -90,7 +90,7 @@ export default async function main() {
     // Use Gemini via our LLM class
     const llm = new LLM({ apiKey });
     const cards = await llm.generateAnkiCards(selectedText, DECK_CATEGORIES);
-    
+
     if (!cards.length) {
       await toast.hide();
       await showHUD("⚠️ No cards generated");
@@ -106,7 +106,9 @@ export default async function main() {
 
     const inserted = (await addCardsToAnki(taggedCards)).filter(Boolean).length;
     await toast.hide();
-    await showHUD(`✅ Added ${inserted} card${inserted !== 1 ? "s" : ""} to Anki`);
+    await showHUD(
+      `✅ Added ${inserted} card${inserted !== 1 ? "s" : ""} to Anki`,
+    );
   } catch (err) {
     await showToast({
       style: Toast.Style.Failure,

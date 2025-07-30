@@ -39,7 +39,9 @@ function formatTokens(tokens: number): string {
 export default function UsageDashboard() {
   const [stats, setStats] = useState<UsageStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeFilter, setTimeFilter] = useState<"today" | "month" | "all">("month");
+  const [timeFilter, setTimeFilter] = useState<"today" | "month" | "all">(
+    "month",
+  );
   const preferences = getPreferenceValues<Preferences>();
 
   const loadStats = async () => {
@@ -79,7 +81,7 @@ export default function UsageDashboard() {
       const filename = `ai-usage-export-${new Date().toISOString().split("T")[0]}.csv`;
       const filepath = join(homedir(), "Downloads", filename);
       writeFileSync(filepath, csv);
-      
+
       showToast({
         style: Toast.Style.Success,
         title: "Usage data exported",
@@ -97,7 +99,8 @@ export default function UsageDashboard() {
   const handleClearData = async () => {
     const confirmed = await confirmAlert({
       title: "Clear All Usage Data?",
-      message: "This action cannot be undone. All usage history will be permanently deleted.",
+      message:
+        "This action cannot be undone. All usage history will be permanently deleted.",
       primaryAction: {
         title: "Clear Data",
         style: Alert.ActionStyle.Destructive,
@@ -154,7 +157,12 @@ export default function UsageDashboard() {
           icon={{ source: Icon.BankNote, tintColor: Color.Green }}
           accessories={[
             { text: `${stats.callCount} calls` },
-            stats.errorCount > 0 ? { text: `${stats.errorCount} errors`, tooltip: "Failed API calls" } : null,
+            stats.errorCount > 0
+              ? {
+                  text: `${stats.errorCount} errors`,
+                  tooltip: "Failed API calls",
+                }
+              : null,
           ].filter(Boolean)}
         />
         <List.Item
@@ -176,10 +184,15 @@ export default function UsageDashboard() {
               key={provider}
               title={provider.charAt(0).toUpperCase() + provider.slice(1)}
               subtitle={formatCost(data.cost)}
-              icon={{ source: Icon.Globe, tintColor: getProviderColor(provider) }}
+              icon={{
+                source: Icon.Globe,
+                tintColor: getProviderColor(provider),
+              }}
               accessories={[
                 { text: `${data.calls} calls` },
-                { text: `${formatTokens(data.inputTokens + data.outputTokens)} tokens` },
+                {
+                  text: `${formatTokens(data.inputTokens + data.outputTokens)} tokens`,
+                },
               ]}
             />
           ))}
@@ -196,7 +209,9 @@ export default function UsageDashboard() {
               icon={{ source: Icon.Cpu, tintColor: Color.Purple }}
               accessories={[
                 { text: `${data.calls} calls` },
-                { text: `${formatTokens(data.inputTokens + data.outputTokens)} tokens` },
+                {
+                  text: `${formatTokens(data.inputTokens + data.outputTokens)} tokens`,
+                },
               ]}
             />
           ))}
@@ -275,26 +290,37 @@ function formatCommandName(command: string): string {
   return names[command] || command;
 }
 
-function getProjectedMonthlyCost(stats: UsageStats, timeFilter: string): string {
+function getProjectedMonthlyCost(
+  stats: UsageStats,
+  timeFilter: string,
+): string {
   if (stats.callCount === 0) return "$0.00";
-  
+
   const now = new Date();
   let daysElapsed: number;
   let daysInMonth: number;
-  
+
   switch (timeFilter) {
     case "today":
       // Project based on today's usage for the whole month
-      daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      daysInMonth = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0,
+      ).getDate();
       return formatCost(stats.totalCost * daysInMonth);
-      
+
     case "month":
       // Project based on usage so far this month
       daysElapsed = now.getDate();
-      daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      daysInMonth = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0,
+      ).getDate();
       const dailyAverage = stats.totalCost / daysElapsed;
       return formatCost(dailyAverage * daysInMonth);
-      
+
     case "all":
       // Can't project monthly from all-time data meaningfully
       return "N/A";

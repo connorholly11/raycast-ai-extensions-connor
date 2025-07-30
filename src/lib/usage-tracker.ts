@@ -19,22 +19,31 @@ export interface UsageStats {
   totalOutputTokens: number;
   callCount: number;
   errorCount: number;
-  byProvider: Record<string, {
-    cost: number;
-    inputTokens: number;
-    outputTokens: number;
-    calls: number;
-  }>;
-  byModel: Record<string, {
-    cost: number;
-    inputTokens: number;
-    outputTokens: number;
-    calls: number;
-  }>;
-  byCommand: Record<string, {
-    cost: number;
-    calls: number;
-  }>;
+  byProvider: Record<
+    string,
+    {
+      cost: number;
+      inputTokens: number;
+      outputTokens: number;
+      calls: number;
+    }
+  >;
+  byModel: Record<
+    string,
+    {
+      cost: number;
+      inputTokens: number;
+      outputTokens: number;
+      calls: number;
+    }
+  >;
+  byCommand: Record<
+    string,
+    {
+      cost: number;
+      calls: number;
+    }
+  >;
 }
 
 const STORAGE_KEY = "ai-usage-records";
@@ -44,21 +53,23 @@ export class UsageTracker {
   /**
    * Record API usage
    */
-  static async recordUsage(record: Omit<UsageRecord, "timestamp" | "cost">): Promise<void> {
+  static async recordUsage(
+    record: Omit<UsageRecord, "timestamp" | "cost">,
+  ): Promise<void> {
     try {
       // Calculate cost
       const cost = calculateCost(
         record.provider,
         record.model,
         record.inputTokens,
-        record.outputTokens
+        record.outputTokens,
       );
 
       // Create full record
       const fullRecord: UsageRecord = {
         ...record,
         timestamp: Date.now(),
-        cost
+        cost,
       };
 
       // Get existing records
@@ -96,9 +107,9 @@ export class UsageTracker {
    */
   static async getStats(startDate?: Date, endDate?: Date): Promise<UsageStats> {
     const records = await this.getRecords();
-    
+
     // Filter by date if provided
-    const filteredRecords = records.filter(record => {
+    const filteredRecords = records.filter((record) => {
       if (startDate && record.timestamp < startDate.getTime()) return false;
       if (endDate && record.timestamp > endDate.getTime()) return false;
       return true;
@@ -113,7 +124,7 @@ export class UsageTracker {
       errorCount: 0,
       byProvider: {},
       byModel: {},
-      byCommand: {}
+      byCommand: {},
     };
 
     // Calculate stats
@@ -122,7 +133,7 @@ export class UsageTracker {
       stats.totalInputTokens += record.inputTokens;
       stats.totalOutputTokens += record.outputTokens;
       stats.callCount++;
-      
+
       if (!record.success) {
         stats.errorCount++;
       }
@@ -133,7 +144,7 @@ export class UsageTracker {
           cost: 0,
           inputTokens: 0,
           outputTokens: 0,
-          calls: 0
+          calls: 0,
         };
       }
       stats.byProvider[record.provider].cost += record.cost;
@@ -148,7 +159,7 @@ export class UsageTracker {
           cost: 0,
           inputTokens: 0,
           outputTokens: 0,
-          calls: 0
+          calls: 0,
         };
       }
       stats.byModel[modelKey].cost += record.cost;
@@ -160,7 +171,7 @@ export class UsageTracker {
       if (!stats.byCommand[record.command]) {
         stats.byCommand[record.command] = {
           cost: 0,
-          calls: 0
+          calls: 0,
         };
       }
       stats.byCommand[record.command].cost += record.cost;
@@ -182,9 +193,9 @@ export class UsageTracker {
    */
   static async exportAsCSV(startDate?: Date, endDate?: Date): Promise<string> {
     const records = await this.getRecords();
-    
+
     // Filter by date if provided
-    const filteredRecords = records.filter(record => {
+    const filteredRecords = records.filter((record) => {
       if (startDate && record.timestamp < startDate.getTime()) return false;
       if (endDate && record.timestamp > endDate.getTime()) return false;
       return true;
@@ -202,11 +213,11 @@ export class UsageTracker {
       "Output Tokens",
       "Cost (USD)",
       "Success",
-      "Error"
+      "Error",
     ];
 
     // Create CSV rows
-    const rows = filteredRecords.map(record => {
+    const rows = filteredRecords.map((record) => {
       const date = new Date(record.timestamp);
       return [
         record.timestamp,
@@ -219,15 +230,14 @@ export class UsageTracker {
         record.outputTokens,
         record.cost.toFixed(6),
         record.success ? "Yes" : "No",
-        record.error || ""
+        record.error || "",
       ];
     });
 
     // Combine headers and rows
-    const csv = [
-      headers.join(","),
-      ...rows.map(row => row.join(","))
-    ].join("\n");
+    const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join(
+      "\n",
+    );
 
     return csv;
   }
@@ -246,7 +256,11 @@ export class UsageTracker {
    */
   static async getTodayStats(): Promise<UsageStats> {
     const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
     return this.getStats(startOfDay);
   }
 }

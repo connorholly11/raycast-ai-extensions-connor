@@ -36,7 +36,7 @@ export default function Command() {
   async function extractTasks() {
     try {
       let text = "";
-      
+
       // Try selected text first, fall back to clipboard
       try {
         text = await getSelectedText();
@@ -60,7 +60,7 @@ export default function Command() {
 
       const { apiKey } = getPreferenceValues<Preferences>();
       const llm = new LLM({ apiKey });
-      
+
       // Use the new method we'll add to LLM
       const extractedTasks = await llm.extractMultipleTasks(text);
 
@@ -86,7 +86,7 @@ export default function Command() {
 
       await showToast({
         style: Toast.Style.Success,
-        title: `Found ${extractedTasks.length} task${extractedTasks.length > 1 ? 's' : ''}`,
+        title: `Found ${extractedTasks.length} task${extractedTasks.length > 1 ? "s" : ""}`,
         message: "Review and press Enter or ⌘S to save selected tasks",
       });
     } catch (error) {
@@ -101,8 +101,8 @@ export default function Command() {
   }
 
   async function saveSelectedTasks() {
-    const selectedTasks = tasks.filter(t => t.selected);
-    
+    const selectedTasks = tasks.filter((t) => t.selected);
+
     if (selectedTasks.length === 0) {
       await showHUD("⚠️ No tasks selected");
       return;
@@ -111,10 +111,13 @@ export default function Command() {
     try {
       // Get existing actions
       const stored = (await LocalStorage.getItem<string>("actions")) ?? "[]";
-      const existingActions = JSON.parse(stored) as { task: string; date: string }[];
+      const existingActions = JSON.parse(stored) as {
+        task: string;
+        date: string;
+      }[];
 
       // Add new tasks
-      const newActions = selectedTasks.map(t => ({
+      const newActions = selectedTasks.map((t) => ({
         task: t.task,
         date: new Date().toISOString(),
       }));
@@ -122,7 +125,9 @@ export default function Command() {
       const allActions = [...existingActions, ...newActions];
       await LocalStorage.setItem("actions", JSON.stringify(allActions));
 
-      await showHUD(`✅ Saved ${selectedTasks.length} task${selectedTasks.length > 1 ? 's' : ''}`);
+      await showHUD(
+        `✅ Saved ${selectedTasks.length} task${selectedTasks.length > 1 ? "s" : ""}`,
+      );
     } catch (error) {
       console.error("Error saving tasks:", error);
       await showToast({
@@ -134,20 +139,20 @@ export default function Command() {
   }
 
   function toggleTask(taskId: string) {
-    setTasks(tasks.map(t => 
-      t.id === taskId ? { ...t, selected: !t.selected } : t
-    ));
+    setTasks(
+      tasks.map((t) => (t.id === taskId ? { ...t, selected: !t.selected } : t)),
+    );
   }
 
   function selectAll() {
-    setTasks(tasks.map(t => ({ ...t, selected: true })));
+    setTasks(tasks.map((t) => ({ ...t, selected: true })));
   }
 
   function deselectAll() {
-    setTasks(tasks.map(t => ({ ...t, selected: false })));
+    setTasks(tasks.map((t) => ({ ...t, selected: false })));
   }
 
-  const selectedCount = tasks.filter(t => t.selected).length;
+  const selectedCount = tasks.filter((t) => t.selected).length;
 
   return (
     <List
@@ -157,14 +162,20 @@ export default function Command() {
     >
       {tasks.length > 0 ? (
         <>
-          <List.Section title="Extracted Tasks" subtitle={`${selectedCount} of ${tasks.length} selected`}>
+          <List.Section
+            title="Extracted Tasks"
+            subtitle={`${selectedCount} of ${tasks.length} selected`}
+          >
             {tasks.map((task) => (
               <List.Item
                 key={task.id}
                 title={task.task}
                 icon={task.selected ? Icon.CheckCircle : Icon.Circle}
                 accessories={[
-                  { text: task.selected ? "Selected" : "", icon: task.selected ? Icon.Check : undefined }
+                  {
+                    text: task.selected ? "Selected" : "",
+                    icon: task.selected ? Icon.Check : undefined,
+                  },
                 ]}
                 actions={
                   <ActionPanel>
@@ -198,12 +209,15 @@ export default function Command() {
               />
             ))}
           </List.Section>
-          
+
           {originalText.length < 500 && (
             <List.Section title="Original Text">
               <List.Item
                 title="Source"
-                subtitle={originalText.substring(0, 100) + (originalText.length > 100 ? "..." : "")}
+                subtitle={
+                  originalText.substring(0, 100) +
+                  (originalText.length > 100 ? "..." : "")
+                }
                 accessories={[{ text: `${originalText.length} chars` }]}
               />
             </List.Section>

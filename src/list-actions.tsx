@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  ActionPanel,
-  Action,
-  Detail,
-  List,
-  LocalStorage,
-} from "@raycast/api";
+import { ActionPanel, Action, Detail, List, LocalStorage } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { execa } from "execa";
 
@@ -43,7 +37,9 @@ export default function Command() {
   return (
     <List searchBarPlaceholder="Filter actions…">
       {items.map((it, idx) => {
-        const days = Math.floor((Date.now() - Date.parse(it.date)) / 86_400_000);
+        const days = Math.floor(
+          (Date.now() - Date.parse(it.date)) / 86_400_000,
+        );
         return (
           <List.Item
             key={idx}
@@ -61,7 +57,10 @@ export default function Command() {
                   title="Mark Done"
                   onAction={async () => {
                     const remaining = items.filter((_, i) => i !== idx);
-                    await LocalStorage.setItem("actions", JSON.stringify(remaining));
+                    await LocalStorage.setItem(
+                      "actions",
+                      JSON.stringify(remaining),
+                    );
                     setItems(remaining);
                   }}
                 />

@@ -37,15 +37,15 @@ async function fetchOpenAIUsage(apiKey: string): Promise<UsageData> {
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
+
     const response = await fetch(
-      `https://api.openai.com/v1/usage?date=${firstDay.toISOString().split('T')[0]}&date=${tomorrow.toISOString().split('T')[0]}`,
+      `https://api.openai.com/v1/usage?date=${firstDay.toISOString().split("T")[0]}&date=${tomorrow.toISOString().split("T")[0]}`,
       {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -53,7 +53,7 @@ async function fetchOpenAIUsage(apiKey: string): Promise<UsageData> {
     }
 
     const data = await response.json();
-    
+
     let totalCost = 0;
     let totalInput = 0;
     let totalOutput = 0;
@@ -65,20 +65,22 @@ async function fetchOpenAIUsage(apiKey: string): Promise<UsageData> {
         const model = usage.snapshot_id;
         const inputTokens = usage.n_context_tokens_total || 0;
         const outputTokens = usage.n_generated_tokens_total || 0;
-        
+
         if (!modelUsage[model]) {
           modelUsage[model] = { input: 0, output: 0 };
         }
-        
+
         modelUsage[model].input += inputTokens;
         modelUsage[model].output += outputTokens;
-        
+
         totalInput += inputTokens;
         totalOutput += outputTokens;
-        
-        const pricing = getModelPricing('openai', model);
+
+        const pricing = getModelPricing("openai", model);
         if (pricing) {
-          totalCost += (inputTokens / 1000) * pricing.input + (outputTokens / 1000) * pricing.output;
+          totalCost +=
+            (inputTokens / 1000) * pricing.input +
+            (outputTokens / 1000) * pricing.output;
         }
       });
     });
@@ -105,8 +107,10 @@ async function fetchAnthropicUsage(apiKey: string): Promise<UsageData> {
     // Anthropic doesn't have a direct usage API endpoint
     // We'll track usage locally through API responses
     const storedUsage = await LocalStorage.getItem<string>("anthropic_usage");
-    const usage = storedUsage ? JSON.parse(storedUsage) : { input: 0, output: 0, cost: 0 };
-    
+    const usage = storedUsage
+      ? JSON.parse(storedUsage)
+      : { input: 0, output: 0, cost: 0 };
+
     return {
       provider: "Anthropic",
       current_cost: usage.cost || 0,
@@ -148,8 +152,8 @@ async function fetchDeepSeekUsage(apiKey: string): Promise<UsageData> {
     // DeepSeek API usage endpoint
     const response = await fetch("https://api.deepseek.com/user/balance", {
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       },
     });
 
@@ -158,11 +162,11 @@ async function fetchDeepSeekUsage(apiKey: string): Promise<UsageData> {
     }
 
     const data = await response.json();
-    
+
     // DeepSeek returns balance info
     const balance = data.balance || 0;
     const totalSpent = data.total_spent || 0;
-    
+
     return {
       provider: "DeepSeek",
       current_cost: totalSpent,
@@ -218,7 +222,7 @@ export default function Command() {
       input: sum.input + data.tokens_used.input,
       output: sum.output + data.tokens_used.output,
     }),
-    { input: 0, output: 0 }
+    { input: 0, output: 0 },
   );
 
   return (
@@ -250,8 +254,12 @@ export default function Command() {
                 ? []
                 : [
                     { text: data.period || "" },
-                    { text: `${(data.tokens_used.input / 1_000).toFixed(0)}K input` },
-                    { text: `${(data.tokens_used.output / 1_000).toFixed(0)}K output` },
+                    {
+                      text: `${(data.tokens_used.input / 1_000).toFixed(0)}K input`,
+                    },
+                    {
+                      text: `${(data.tokens_used.output / 1_000).toFixed(0)}K output`,
+                    },
                   ]
             }
             actions={
@@ -260,7 +268,10 @@ export default function Command() {
                   title="Refresh"
                   icon={Icon.ArrowClockwise}
                   onAction={() => {
-                    showToast({ title: "Refreshing usage data...", style: Toast.Style.Animated });
+                    showToast({
+                      title: "Refreshing usage data...",
+                      style: Toast.Style.Animated,
+                    });
                   }}
                 />
                 {data.models && (
@@ -270,19 +281,27 @@ export default function Command() {
                     target={
                       <List navigationTitle={`${data.provider} Models`}>
                         {Object.entries(data.models).map(([model, usage]) => {
-                          const pricing = getModelPricing(data.provider.toLowerCase(), model);
+                          const pricing = getModelPricing(
+                            data.provider.toLowerCase(),
+                            model,
+                          );
                           const cost = pricing
-                            ? (usage.input / 1000) * pricing.input + (usage.output / 1000) * pricing.output
+                            ? (usage.input / 1000) * pricing.input +
+                              (usage.output / 1000) * pricing.output
                             : 0;
-                          
+
                           return (
                             <List.Item
                               key={model}
                               title={model}
                               subtitle={formatCost(cost)}
                               accessories={[
-                                { text: `${(usage.input / 1_000).toFixed(0)}K input` },
-                                { text: `${(usage.output / 1_000).toFixed(0)}K output` },
+                                {
+                                  text: `${(usage.input / 1_000).toFixed(0)}K input`,
+                                },
+                                {
+                                  text: `${(usage.output / 1_000).toFixed(0)}K output`,
+                                },
                               ]}
                             />
                           );
@@ -312,7 +331,8 @@ export default function Command() {
               accessories={[
                 {
                   text: totalCost > 100 ? "High usage" : "Normal usage",
-                  icon: totalCost > 100 ? Icon.ExclamationMark : Icon.CheckCircle,
+                  icon:
+                    totalCost > 100 ? Icon.ExclamationMark : Icon.CheckCircle,
                 },
               ]}
             />
